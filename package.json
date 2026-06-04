@@ -1,0 +1,8 @@
+{
+  "name": "infinite-skills",
+  "version": "0.1.0",
+  "description": "Codex skills from Infinite Labs OS.",
+  "type": "module",
+  "license": "MIT",
+  "private": false
+}
