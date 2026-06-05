@@ -9,6 +9,14 @@ argument-hint: "<goal draft or request>"
 `/goal` is for durable autonomous work. The goal text is the exit criteria, so do not create
 or continue a goal from a rough request until the request has passed the preflight below.
 
+## Anti-Pattern: "I basically know the goal, I'll just start"
+
+This is the failure that wastes the most time. A goal that *sounds* clear in your head
+("make it faster", "match this design") is almost never a verifiable exit criterion. If you
+skip the preflight, the run goes for hours and either stops early on a fuzzy match or
+rabbit-holes on the wrong thing. Every goal passes the preflight — the synthesis can be short,
+but it must produce a checkable done-condition.
+
 ## Mandatory Preflight
 
 Run this before calling `create_goal`, updating an active goal, or treating a `/goal` message as
@@ -49,6 +57,40 @@ Ask before starting if any required field is missing:
 
 Stop interviewing as soon as the missing fields are answered or safely inferable. Goal mode should
 clarify enough to execute, not become an endless planning conversation.
+
+## Prefer Verifiable, Numeric Exit Criteria
+
+A good done-condition is observable and, where possible, numeric. Examples:
+
+- "Reduce build and deployment time by 30%."
+- "Migrate this feature from TypeScript to Rust and reach 100% test parity."
+- "Get production largest-contentful-paint below 2.5s."
+
+A number is not mandatory, but it makes every other field sharper. If you cannot frame a
+verifiable criterion yet, keep interviewing — do not start the goal on a feeling of "done".
+
+## Make Progress Measurable
+
+If the goal is ambitious or has many possible paths, ensure there is a way to *know it is
+getting closer*. Sometimes this is free (build times, test counts). Otherwise build or request
+measurement tooling — an eval suite, or a visual-diff tool comparing two screenshots (such a
+tool can evolve over the run to add diff modes). Without a measurement method, the goal cannot
+self-verify and is not ready to start.
+
+## Create a Realistic Environment
+
+Real progress needs same stack, same flags, similar database, and real deploy/test targets that
+mimic production. Watch for environments that diverge from prod — e.g. deploy previews with build
+paths disabled versus full production runs; in that case do manual deploys to a prod-like config
+instead. Computer-use or even a physical device (e.g. iOS profiling traces) can give the most
+accurate signal when the goal is performance- or UI-sensitive.
+
+## Special Case: Visual Goals
+
+"Implement this UI 100% pixel perfect from this image" is tempting but risky — the run may
+rabbit-hole on generating SVG icons/images and burn tokens on repeated image comparison.
+Instead use images as **context**, and define done via **feature checklists, specs, and
+design-system adherence**. Never make the raw image the sole exit criterion.
 
 ## Goal Contract Template
 
@@ -102,6 +144,27 @@ that another agent could decide whether the goal is complete.
 - Mark a goal complete only after the final verification evidence exists.
 - Mark blocked only when the same blocker has repeated for at least three consecutive goal turns
   and no meaningful alternative remains.
+
+## Tracking Long Runs
+
+When a goal runs for hours or days (possibly on another machine), keep progress visible:
+
+- **Commit at meaningful steps and push to a draft PR** — especially useful with preview
+  deployments.
+- **Maintain a progress artifact** — an HTML dashboard kept open, a rendered graph image, or a
+  plain markdown status file.
+- **Post updates** to Slack or wherever progress is tracked, if the user asked for it.
+- **Use side chats for status checks** — `/side` forks the current thread (full context, short
+  lived) to ask "where are we?" without disturbing the run; a recurring check-in can be scheduled.
+
+## Finalization
+
+Reaching the target is not the end. Because the run continues until the bar is met, it may leave
+dead ends and failed experiments behind. Before reporting completion:
+
+- Run `/review` for a local code review.
+- Reflect on the attempts made during the run and remove leftover or abandoned changes.
+- This matters most for optimization tasks, where many approaches get tried.
 
 ## Question Examples
 
