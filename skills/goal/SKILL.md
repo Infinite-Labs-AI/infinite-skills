@@ -1,6 +1,6 @@
 ---
 name: goal
-description: "Use when the user invokes /goal, asks for Codex goal mode, or starts long-horizon autonomous work that should be clarified into a concrete verifiable objective before execution."
+description: "Use when the user invokes /goal, asks for Codex goal mode, designs an agent loop, or starts long-horizon autonomous work that should be clarified into a concrete verifiable objective before execution."
 argument-hint: "<goal draft or request>"
 ---
 
@@ -17,6 +17,17 @@ skip the preflight, the run goes for hours and either stops early on a fuzzy mat
 rabbit-holes on the wrong thing. Every goal passes the preflight — the synthesis can be short,
 but it must produce a checkable done-condition.
 
+## Goal Mode Is a Loop
+
+A durable run needs four live parts: **goal, context, evaluation, and agent action**. The goal
+sets direction, context supplies the next useful signal, evaluation decides whether the loop is
+closer to done, and agent action makes the next change. If any part is missing, do not start
+autonomous work yet.
+
+Design the loop, not just the first prompt. Name what signal should be fetched next, how often
+the agent should re-check it, what evidence decides progress, and what budget or stopping rule
+prevents runaway iteration.
+
 ## Mandatory Preflight
 
 Run this before calling `create_goal`, updating an active goal, or treating a `/goal` message as
@@ -28,8 +39,8 @@ the working objective.
 3. **Inspect local context first.** When files, repos, docs, tests, URLs, or prior plans are
    relevant and safely inspectable, read them before asking questions.
 4. **Run the ambiguity gate.** A goal is not ready until these fields are known or safely inferred:
-   outcome, done evidence, scope boundaries, starting point, constraints, anti-cheat criteria,
-   progress tracking, and final verification.
+   outcome, done evidence, scope boundaries, starting point, context refresh, constraints,
+   anti-cheat criteria, progress tracking, and final verification.
 5. **Ask clarifying questions.** Ask only questions that change the goal contract. Prefer one
    high-leverage question at a time when answers branch; ask up to three concise questions when
    they are independent. Multiple choice is preferred when it reduces ambiguity.
@@ -50,7 +61,8 @@ Ask before starting if any required field is missing:
 | Done evidence | What command, metric, screenshot, deploy, file, or manual check proves completion? |
 | Scope | What is included, and what is explicitly out of bounds? |
 | Starting point | Which repo, files, URLs, failing checks, plan, or environment should be inspected first? |
-| Constraints | Are new dependencies, network calls, commits, PRs, migrations, destructive actions, or paid services allowed? |
+| Context refresh | What new signals should the loop re-fetch: CI, logs, analytics, user reports, errors, metrics, screenshots, or review comments? |
+| Constraints | Are new dependencies, network calls, commits, PRs, migrations, destructive actions, paid services, parallel agents, or spending/token budgets allowed? |
 | Anti-cheat | What would be a fake win, such as deleting tests, hiding failures, cropping a screenshot, or weakening requirements? |
 | Progress | Should progress be tracked in a status file, commits, PR, dashboard, or concise chat updates? |
 | Finalization | What cleanup, review, tests, and handoff are expected after the target is met? |
@@ -76,6 +88,24 @@ getting closer*. Sometimes this is free (build times, test counts). Otherwise bu
 measurement tooling — an eval suite, or a visual-diff tool comparing two screenshots (such a
 tool can evolve over the run to add diff modes). Without a measurement method, the goal cannot
 self-verify and is not ready to start.
+
+## Refresh Context During the Loop
+
+Do not dump all possible context into the initial goal. Start with the smallest useful context,
+then deliberately fetch more as the loop advances. Good refresh signals include CI results,
+failure traces, product analytics, user reports, session replays, logs, benchmark output, and
+review feedback.
+
+For self-driving product work, the loop should usually be: collect signals, ship an improvement,
+evaluate impact, then repeat. Make sure the goal contract names which signals are authoritative
+and which changes are small enough to run without strategic re-approval.
+
+## Use Subagents Deliberately
+
+Use subagents when independent work can be separated from the control loop: parallel research,
+codebase inspection, failure triage, review, or implementation shards with clear boundaries.
+The main agent remains responsible for the goal contract, budget, synthesis, and final
+verification. Do not let subagents redefine the goal or decide completion.
 
 ## Create a Realistic Environment
 
@@ -107,8 +137,12 @@ Scope:
 - Include: <areas>
 - Exclude: <non-goals>
 
+Context refresh:
+- Re-check <signals> every <cadence or milestone>
+
 Constraints:
 - <allowed tools/dependencies/side effects/budget>
+- <parallelism, token, time, or cost limits>
 
 Anti-cheat:
 - <ways not to satisfy the goal>
@@ -131,8 +165,8 @@ that another agent could decide whether the goal is complete.
   `create_goal` is the programmatic `/goal` invocation.
 - If no active goal exists and `create_goal` is available, call it with the synthesized objective.
   The objective must include the relevant contract details from the interview: done evidence,
-  scope, constraints, anti-cheat criteria, starting point, progress tracking, and final
-  verification. Do not pass only the headline goal.
+  scope, context refresh, constraints, anti-cheat criteria, starting point, progress tracking,
+  and final verification. Do not pass only the headline goal.
 - If the Codex client already created an active goal from the rough `/goal` text, pause
   implementation, finish this preflight, and use the synthesized contract as the current working
   contract unless the user explicitly wants to replace or stop the old goal.
