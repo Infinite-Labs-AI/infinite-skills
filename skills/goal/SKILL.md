@@ -1,208 +1,149 @@
 ---
 name: goal
-description: "Use when the user invokes /goal, asks for Codex goal mode, designs an agent loop, or starts long-horizon autonomous work that should be clarified into a concrete verifiable objective before execution."
+description: "Use when the user invokes /goal, asks for goal mode, designs an agent loop, or starts long-horizon autonomous work that should be clarified into a concrete, verifiable objective before execution."
 argument-hint: "<goal draft or request>"
 ---
 
-# Codex Goal Mode (/goal)
+# Goal Mode (/goal)
 
-`/goal` is for durable autonomous work. The goal text is the exit criteria, so do not create
-or continue a goal from a rough request until the request has passed the preflight below.
+`/goal` is for durable autonomous work: the goal text becomes the **exit criteria** the agent is
+re-checked against after every turn, so it keeps working until the goal holds. So the rule is simple —
+**the agent must know what "done" means, and how it will be proven, before it starts.** The preflight
+below makes sure of that: a fuzzy goal gets a real **discovery conversation** first (so you shape it
+together), then a tight structured confirmation; a genuinely crisp goal can fast-path straight to the
+contract. Never start on "I'll know it when I see it."
 
-## Anti-Pattern: "I basically know the goal, I'll just start"
+## The bar: a runnable, self-evident done-check
 
-This is the failure that wastes the most time. A goal that *sounds* clear in your head
-("make it faster", "match this design") is almost never a verifiable exit criterion. If you
-skip the preflight, the run goes for hours and either stops early on a fuzzy match or
-rabbit-holes on the wrong thing. Every goal passes the preflight — the synthesis can be short,
-but it must produce a checkable done-condition.
+A goal is ready when its done-condition is **observable, ideally numeric, and provable from what the
+agent itself surfaces** — not asserted. The turn-by-turn completion check judges the agent's own
+output and does **not** run your tools, so write the done-check as something the agent *demonstrates in
+the transcript* (show the passing test / the metric / the diff), never "trust me, it passes." Pick the
+strongest **available** check, in this order:
 
-## Goal Mode Is a Loop
+1. **Rules / commands** — `npm test` exits 0, build succeeds, lint clean, a benchmark number. (Best.)
+2. **Visual** — a screenshot or visual diff, for UI. (Specs/checklists are the real criterion — never a raw image alone.)
+3. **LLM judgement** — last resort; not robust, high latency.
 
-A durable run needs four live parts: **goal, context, evaluation, and agent action**. The goal
-sets direction, context supplies the next useful signal, evaluation decides whether the loop is
-closer to done, and agent action makes the next change. If any part is missing, do not start
-autonomous work yet.
+Good goals carry a number: *"Reduce build+deploy time 30%."* · *"Migrate this feature TS→Rust at 100%
+test parity."* · *"Get production LCP < 2.5s."* If you can't yet name a runnable check, that is the ONE
+thing to resolve before starting — propose a check and confirm it; don't start on a feeling.
 
-Design the loop, not just the first prompt. Name what signal should be fetched next, how often
-the agent should re-check it, what evidence decides progress, and what budget or stopping rule
-prevents runaway iteration.
+## Preflight: discovery → decide → start
 
-## Mandatory Preflight
+A goal should be **bigger than one prompt but smaller than an open-ended backlog.** If the request is a
+loose list of unrelated work, it's not a goal — ask to split it; do not interview.
 
-Run this before calling `create_goal`, updating an active goal, or treating a `/goal` message as
-the working objective.
+1. **Classify intent.** Only answering a question about goal mode → answer normally. Starting
+   autonomous work → continue.
+2. **Read local context first.** Inspect the relevant files / failing tests / logs / docs / plan
+   BEFORE asking anything — most fields are inferable straight from the repo.
+3. **Discovery — a real, CONVERSATIONAL back-and-forth (do this BEFORE the structured questions).**
+   Reflect back what you understand, then have an open exchange — **typically 3–6 short rounds** — to
+   genuinely understand: the *why* behind it, what "great" looks like, the approach/options and their
+   trade-offs, the constraints, and the landmines/risks. Go one thread at a time, build on each answer,
+   and **listen more than you talk** — **plain open questions, NOT multiple-choice**. Don't rush to the
+   structured gate; keep exploring until you could explain the goal back *better* than the user first
+   did. Stop once it's genuinely well-understood (or sooner if the user signals they're ready). (Per
+   OpenAI's own guidance: brainstorm the project first, *then* set the goal.)
+4. **Draft the contract stub** — one line, and the forcing artifact: you literally cannot fill it
+   without an exit criterion. Emit it from the discovery + context:
+   > **Outcome:** _\<one concrete end state\>_ · **Done when:** _\<runnable check + expected result\>_ ·
+   > **Guard:** _\<only the must-not-regress / destructive limits\>_ · **Inferred (correct me):**
+   > start=_\<files/URLs\>_, between-tries=_\<iteration policy\>_, refresh=_\<signals\>_,
+   > track=_\<commits + progress log\>_, on-blocked=_\<what to report + what would unlock\>_
+5. **Lock the MANDATORY fields with STRUCTURED questions.** Now switch from open chat to decisions:
+   just three things must be user-confirmed *if still unresolved* — **Outcome**, the **Done-check**,
+   and any **destructive/irreversible constraint** (paid deps, migrations, force-push, prod deploy,
+   real spend). Ask these as **at most 3 multiple-choice questions in ONE batch** (multiple-choice
+   because these are decisions, not exploration). Everything else — scope, starting point, iteration
+   policy, context-refresh, anti-cheat, tracking, finalization — **infer and put in the stub's
+   "Inferred" line** for the user to redline; don't ask. Never run a second batch unless an answer
+   revealed a contradiction; tempted to ask a 4th → infer it and state it instead.
+6. **Start.** Emit the final stub and invoke goal mode (`create_goal` where the runtime has it); begin
+   immediately. Don't ask "should I proceed" unless the next action is destructive or externally
+   side-effectful.
 
-1. **Classify intent.** If the user is only asking about goal mode, answer normally. If they are
-   invoking `/goal` or asking you to start autonomous work, continue.
-2. **Capture the draft.** Restate the likely outcome in one sentence.
-3. **Inspect local context first.** When files, repos, docs, tests, URLs, or prior plans are
-   relevant and safely inspectable, read them before asking questions.
-4. **Run the ambiguity gate.** A goal is not ready until these fields are known or safely inferred:
-   outcome, done evidence, scope boundaries, starting point, context refresh, constraints,
-   anti-cheat criteria, progress tracking, and final verification.
-5. **Ask clarifying questions.** Ask only questions that change the goal contract. Prefer one
-   high-leverage question at a time when answers branch; ask up to three concise questions when
-   they are independent. Multiple choice is preferred when it reduces ambiguity.
-6. **Synthesize the goal contract.** Write a concise objective with explicit exit criteria and
-   verification. Include constraints and exclusions when they prevent drift.
-7. **Start execution.** Once the ambiguity gate passes, invoke goal mode by calling `create_goal`
-   with the synthesized objective when the tool is available, then begin work immediately. Do not
-   ask "should I proceed" unless the next action is destructive, externally side-effectful, or the
-   remaining ambiguity materially changes the work.
+> **Fast path:** if the request already makes the outcome AND a runnable check unambiguous (you could
+> state the success check in one sentence), **skip discovery and the questions** — emit the stub and
+> start. Discovery + rigor are for fuzzy goals, not clear ones.
 
-## Ambiguity Gate
+The rhythm: **listen (discovery) → decide (structured questions) → start.** Discovery is open, human,
+and can take several rounds (≈3–6); the structured batch is tight (≤3, one shot). Spend the time
+*understanding*, not interrogating.
 
-Ask before starting if any required field is missing:
+## Design the loop, not just the first prompt
 
-| Field | Question to answer |
-| --- | --- |
-| Outcome | What concrete artifact, behavior, metric, or state must exist? |
-| Done evidence | What command, metric, screenshot, deploy, file, or manual check proves completion? |
-| Scope | What is included, and what is explicitly out of bounds? |
-| Starting point | Which repo, files, URLs, failing checks, plan, or environment should be inspected first? |
-| Context refresh | What new signals should the loop re-fetch: CI, logs, analytics, user reports, errors, metrics, screenshots, or review comments? |
-| Constraints | Are new dependencies, network calls, commits, PRs, migrations, destructive actions, paid services, parallel agents, or spending/token budgets allowed? |
-| Anti-cheat | What would be a fake win, such as deleting tests, hiding failures, cropping a screenshot, or weakening requirements? |
-| Progress | Should progress be tracked in a status file, commits, PR, dashboard, or concise chat updates? |
-| Finalization | What cleanup, review, tests, and handoff are expected after the target is met? |
+A durable run needs four live parts — **goal, context, evaluation, action** (gather context → act →
+verify → repeat). Name them in the stub:
 
-Stop interviewing as soon as the missing fields are answered or safely inferable. Goal mode should
-clarify enough to execute, not become an endless planning conversation.
+- **Iteration policy (between tries):** how to choose the next move — default *"re-run the done-check,
+  attack the largest remaining gap."* This is what prevents rabbit-holing.
+- **Context refresh:** start with the *smallest useful* context, then deliberately fetch more (CI,
+  logs, failure traces, analytics, review feedback) as the loop advances — don't dump it all up front.
+- **Guidance:** point at where to start and what tools it may use. For ambitious goals, research/plan
+  first → write a plan file → have the goal reference it.
+- **Verify with the strongest signal, and don't self-grade:** prefer rules over a model's opinion; for
+  big runs, use a fresh-context verification subagent so the agent doing the work isn't the one judging
+  it.
+- **Budget ≠ done:** hitting a turn/time/token budget is NOT completion — stop substantive work,
+  summarize progress + blockers, and name the next useful step. Add an explicit *"or stop after N
+  turns"* clause when you want a hard ceiling.
 
-## Prefer Verifiable, Numeric Exit Criteria
+## Make progress measurable
 
-A good done-condition is observable and, where possible, numeric. Examples:
+If the goal is ambitious or has many paths, the loop must be able to *know it's getting closer*.
+Sometimes that's free (build time, test count); otherwise build or request the tool — an eval suite, or
+a visual-diff tool (which can evolve diff modes over the run). Guard against fake wins the headline
+check would miss — deleting/weakening tests, cropping a screenshot, inlining the design image to look
+"pixel perfect." Derive the anti-cheat clause mechanically from the done-check. For visual goals
+especially: use images as *context*, but define "done" via feature checklists / specs / design-system
+adherence — never make the raw image the sole exit criterion.
 
-- "Reduce build and deployment time by 30%."
-- "Migrate this feature from TypeScript to Rust and reach 100% test parity."
-- "Get production largest-contentful-paint below 2.5s."
+## Create a realistic environment
 
-A number is not mandatory, but it makes every other field sharper. If you cannot frame a
-verifiable criterion yet, keep interviewing — do not start the goal on a feeling of "done".
+Real progress needs the real stack: same flags, a similar database, deploy/test targets that mimic
+production. Watch for environments that diverge from prod (e.g. preview builds with paths disabled) —
+do manual prod-like deploys instead. Computer-use or a physical device gives the most accurate signal
+for performance/UI goals.
 
-## Make Progress Measurable
+## Track long runs
 
-If the goal is ambitious or has many possible paths, ensure there is a way to *know it is
-getting closer*. Sometimes this is free (build times, test counts). Otherwise build or request
-measurement tooling — an eval suite, or a visual-diff tool comparing two screenshots (such a
-tool can evolve over the run to add diff modes). Without a measurement method, the goal cannot
-self-verify and is not ready to start.
-
-## Refresh Context During the Loop
-
-Do not dump all possible context into the initial goal. Start with the smallest useful context,
-then deliberately fetch more as the loop advances. Good refresh signals include CI results,
-failure traces, product analytics, user reports, session replays, logs, benchmark output, and
-review feedback.
-
-For self-driving product work, the loop should usually be: collect signals, ship an improvement,
-evaluate impact, then repeat. Make sure the goal contract names which signals are authoritative
-and which changes are small enough to run without strategic re-approval.
-
-## Use Subagents Deliberately
-
-Use subagents when independent work can be separated from the control loop: parallel research,
-codebase inspection, failure triage, review, or implementation shards with clear boundaries.
-The main agent remains responsible for the goal contract, budget, synthesis, and final
-verification. Do not let subagents redefine the goal or decide completion.
-
-## Create a Realistic Environment
-
-Real progress needs same stack, same flags, similar database, and real deploy/test targets that
-mimic production. Watch for environments that diverge from prod — e.g. deploy previews with build
-paths disabled versus full production runs; in that case do manual deploys to a prod-like config
-instead. Computer-use or even a physical device (e.g. iOS profiling traces) can give the most
-accurate signal when the goal is performance- or UI-sensitive.
-
-## Special Case: Visual Goals
-
-"Implement this UI 100% pixel perfect from this image" is tempting but risky — the run may
-rabbit-hole on generating SVG icons/images and burn tokens on repeated image comparison.
-Instead use images as **context**, and define done via **feature checklists, specs, and
-design-system adherence**. Never make the raw image the sole exit criterion.
-
-## Goal Contract Template
-
-Use this shape when creating the objective:
-
-```text
-Goal: <single concrete outcome>
-
-Done when:
-- <observable proof 1>
-- <observable proof 2>
-
-Scope:
-- Include: <areas>
-- Exclude: <non-goals>
-
-Context refresh:
-- Re-check <signals> every <cadence or milestone>
-
-Constraints:
-- <allowed tools/dependencies/side effects/budget>
-- <parallelism, token, time, or cost limits>
-
-Anti-cheat:
-- <ways not to satisfy the goal>
-
-Execution notes:
-- Start at <files/docs/tests/URLs>
-- Track progress via <artifact or update cadence>
-
-Final verification:
-- Run <commands/checks/manual verification>
-- Clean up dead ends before reporting completion
-```
-
-Keep the final goal prompt short enough to be remembered across a long run, but specific enough
-that another agent could decide whether the goal is complete.
-
-## Running the Goal
-
-- Do not ask the user to type `/goal` again after the interview. In Codex agent context,
-  `create_goal` is the programmatic `/goal` invocation.
-- If no active goal exists and `create_goal` is available, call it with the synthesized objective.
-  The objective must include the relevant contract details from the interview: done evidence,
-  scope, context refresh, constraints, anti-cheat criteria, starting point, progress tracking,
-  and final verification. Do not pass only the headline goal.
-- If the Codex client already created an active goal from the rough `/goal` text, pause
-  implementation, finish this preflight, and use the synthesized contract as the current working
-  contract unless the user explicitly wants to replace or stop the old goal.
-- If `create_goal` is unavailable, provide the synthesized objective as the exact `/goal` payload
-  and continue only when the client exposes an active goal or the user explicitly asks for normal
-  non-goal execution.
-- If the user gives a token budget, pass it to the goal tool. Otherwise do not invent one.
-- After major work chunks, check goal status and continue until the contract is met.
-- Mark a goal complete only after the final verification evidence exists.
-- Mark blocked only when the same blocker has repeated for at least three consecutive goal turns
-  and no meaningful alternative remains.
-
-## Tracking Long Runs
-
-When a goal runs for hours or days (possibly on another machine), keep progress visible:
-
-- **Commit at meaningful steps and push to a draft PR** — especially useful with preview
-  deployments.
-- **Maintain a progress artifact** — an HTML dashboard kept open, a rendered graph image, or a
-  plain markdown status file.
-- **Post updates** to Slack or wherever progress is tracked, if the user asked for it.
-- **Use side chats for status checks** — `/side` forks the current thread (full context, short
-  lived) to ask "where are we?" without disturbing the run; a recurring check-in can be scheduled.
+When a goal runs for hours or days (possibly on another machine), keep progress visible: commit at
+meaningful steps + push to a **draft PR** (great with preview deploys); keep a **progress artifact**
+(HTML dashboard / rendered graph / markdown); post milestones to **Slack** if asked; and use a short
+side-thread or a scheduled check-in to ask "where are we?" without disturbing the run.
 
 ## Finalization
 
-Reaching the target is not the end. Because the run continues until the bar is met, it may leave
-dead ends and failed experiments behind. Before reporting completion:
+Reaching the target isn't the end — the run may have left dead ends and failed experiments behind.
+Before reporting done: run a review; reflect on the attempts and remove leftover/abandoned changes
+(matters most for optimization tasks). When reviewing, flag only gaps that affect **correctness or the
+stated criteria** — a reviewer told to "find gaps" always finds some, and chasing every one causes
+over-engineering. Mark complete ONLY when the done-check's evidence exists in the transcript; mark
+blocked only after the same blocker has held for ~3 turns with no alternative.
 
-- Run `/review` for a local code review.
-- Reflect on the attempts made during the run and remove leftover or abandoned changes.
-- This matters most for optimization tasks, where many approaches get tried.
+## Full contract — expand ONLY for multi-day / multi-agent runs
 
-## Question Examples
+The one-line stub is enough to start most goals. For long, multi-agent, or hand-off runs, expand it:
 
-- "Which result should count as done: passing the full CI suite, fixing one failing job, or merging a PR?"
-- "Is adding a new dependency allowed, or should the solution stay within the current stack?"
-- "What would be an unacceptable shortcut here, even if the headline metric improves?"
-- "Where should I start: the failing test output, the last PR, or a specific file?"
+```text
+Goal: <single concrete outcome>
+Done when: <observable, runnable proof(s) — judgeable from the agent's own output>
+Scope: include <areas> · exclude <non-goals>
+Iteration policy: <how to pick the next move after each attempt>
+Context refresh: re-check <signals> every <cadence / milestone>
+Constraints: <allowed deps / side-effects / budget; what must not regress>
+Anti-cheat: <ways NOT to satisfy it>
+Start at: <files / docs / tests / URLs> · Track via: <commits / PR / artifact>
+On blocked: <what to report + what would unlock progress>
+Final check: <commands / manual verification>; clean up dead ends before reporting done
+```
+
+Keep the live goal prompt short enough to remember across a long run, specific enough that another
+agent could decide whether it's complete.
+
+<!-- Modeled on Dominik Kundel's (OpenAI) /goal guidance + OpenAI's "Using Goals in Codex" cookbook and
+Anthropic's Claude Code /goal docs, "Building Effective Agents," and best-practices. The balance:
+always produce a verifiable, self-evident exit condition before starting — but infer everything
+inferable and cap clarifying questions at 3-in-one-batch so a clear goal starts with zero. -->
