@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Codex skills from Infinite Labs OS.",
   "type": "module",
+  "scripts": {
+    "validate": "python3 scripts/validate_marketing_skills.py"
+  },
   "license": "MIT",
   "private": false
 }

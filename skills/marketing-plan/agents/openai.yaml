@@ -1,0 +1,4 @@
+interface:
+  display_name: "Marketing Plan"
+  short_description: "organizing marketing priorities, growth backlog, campaign c."
+  default_prompt: "Use $marketing-plan to help with this marketing task."

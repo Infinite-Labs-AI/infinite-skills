@@ -1,0 +1,4 @@
+interface:
+  display_name: "A/B Testing"
+  short_description: "turning a marketing, growth, CRO, pricing, onboarding, emai."
+  default_prompt: "Use $ab-testing to help with this marketing task."

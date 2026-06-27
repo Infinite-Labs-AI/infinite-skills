@@ -1,0 +1,4 @@
+interface:
+  display_name: "Email Sequence"
+  short_description: "creating, auditing, or improving welcome, onboarding, nurtu."
+  default_prompt: "Use $email-sequence to help with this marketing task."

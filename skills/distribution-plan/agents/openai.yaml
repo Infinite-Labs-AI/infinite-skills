@@ -1,0 +1,4 @@
+interface:
+  display_name: "Distribution Plan"
+  short_description: "planning social, community, PR, founder-led content, newsle."
+  default_prompt: "Use $distribution-plan to help with this marketing task."

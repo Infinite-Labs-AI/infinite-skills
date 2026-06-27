@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ecommerce and App CRO"
+  short_description: "improving ecommerce product pages, collection pages, carts,."
+  default_prompt: "Use $ecommerce-app-cro to help with this marketing task."

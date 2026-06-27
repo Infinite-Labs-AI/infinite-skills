@@ -1,0 +1,4 @@
+interface:
+  display_name: "Competitor Analysis"
+  short_description: "researching competitors, alternatives, market gaps, win-los."
+  default_prompt: "Use $competitor-analysis to help with this marketing task."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sales Enablement"
+  short_description: "creating sales assets that help a buyer make the next decis."
+  default_prompt: "Use $sales-enablement to help with this marketing task."

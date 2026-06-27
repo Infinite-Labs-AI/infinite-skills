@@ -1,0 +1,4 @@
+interface:
+  display_name: "Launch Strategy"
+  short_description: "planning a product launch, feature release, waitlist, beta,."
+  default_prompt: "Use $launch-strategy to help with this marketing task."

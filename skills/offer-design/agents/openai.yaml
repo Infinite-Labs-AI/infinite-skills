@@ -1,0 +1,4 @@
+interface:
+  display_name: "Offer Design"
+  short_description: "designing or improving an offer, package, pricing page argu."
+  default_prompt: "Use $offer-design to help with this marketing task."

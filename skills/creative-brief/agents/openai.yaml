@@ -1,0 +1,4 @@
+interface:
+  display_name: "Creative Brief"
+  short_description: "planning ad creative, social posts, launch videos, product."
+  default_prompt: "Use $creative-brief to help with this marketing task."

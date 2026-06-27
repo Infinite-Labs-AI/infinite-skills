@@ -1,0 +1,4 @@
+interface:
+  display_name: "SEO Strategy"
+  short_description: "planning SEO pages, content clusters, site architecture, co."
+  default_prompt: "Use $seo-strategy to help with this marketing task."

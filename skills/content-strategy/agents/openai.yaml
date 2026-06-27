@@ -1,0 +1,4 @@
+interface:
+  display_name: "Content Strategy"
+  short_description: "planning or drafting content grounded in customer stories,."
+  default_prompt: "Use $content-strategy to help with this marketing task."

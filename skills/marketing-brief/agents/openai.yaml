@@ -1,0 +1,4 @@
+interface:
+  display_name: "Marketing Brief"
+  short_description: "turning a product, feature, client, or rough idea into a pr."
+  default_prompt: "Use $marketing-brief to help with this marketing task."

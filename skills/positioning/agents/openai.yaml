@@ -1,0 +1,4 @@
+interface:
+  display_name: "Positioning"
+  short_description: "choosing or sharpening positioning for a product, feature,."
+  default_prompt: "Use $positioning to help with this marketing task."

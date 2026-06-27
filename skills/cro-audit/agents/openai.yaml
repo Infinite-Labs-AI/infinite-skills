@@ -1,0 +1,4 @@
+interface:
+  display_name: "CRO Audit"
+  short_description: "reviewing a landing page, homepage, signup page, pricing pa."
+  default_prompt: "Use $cro-audit to help with this marketing task."

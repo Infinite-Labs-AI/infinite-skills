@@ -1,0 +1,4 @@
+interface:
+  display_name: "Paid Ads"
+  short_description: "reviewing or planning paid acquisition across Google, Meta,."
+  default_prompt: "Use $paid-ads to help with this marketing task."

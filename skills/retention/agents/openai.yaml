@@ -1,0 +1,4 @@
+interface:
+  display_name: "Retention"
+  short_description: "reducing churn, improving activation, cancellation flows, w."
+  default_prompt: "Use $retention to help with this marketing task."

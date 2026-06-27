@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cold Outreach"
+  short_description: "creating or improving B2B outbound, prospecting, cold email."
+  default_prompt: "Use $cold-outreach to help with this marketing task."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Analytics Tracking"
+  short_description: "auditing, planning, or debugging marketing measurement, con."
+  default_prompt: "Use $analytics-tracking to help with this marketing task."

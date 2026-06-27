@@ -1,0 +1,4 @@
+interface:
+  display_name: "Partnerships"
+  short_description: "finding or planning partner, referral, affiliate, creator,."
+  default_prompt: "Use $partnerships to help with this marketing task."
