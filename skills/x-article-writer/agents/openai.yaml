@@ -1,0 +1,4 @@
+interface:
+  display_name: "X Article Writer"
+  short_description: "Write longform X articles for launches and growth."
+  default_prompt: "Use $x-article-writer to draft an X article from this idea."

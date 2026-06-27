@@ -82,6 +82,7 @@ EXPECTED_MARKETING_SKILLS = {
     "retention",
     "sales-enablement",
     "seo-strategy",
+    "x-article-writer",
 }
 
 
@@ -290,7 +291,7 @@ def main() -> None:
             source_section_sets,
         )
 
-    print(f"OK: validated {len(found)} original marketing skills")
+    print(f"OK: validated {len(found)} marketing skills")
 
 
 if __name__ == "__main__":

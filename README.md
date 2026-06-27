@@ -22,13 +22,14 @@ headings, deliverables, and validation checks.
 - `competitor-analysis` - Competitors, alternatives, win-loss themes, and battlecards.
 - `offer-design` - Pricing, packages, guarantees, plans, trials, and upgrade paths.
 - `marketing-plan` - Priorities, budgets, campaigns, calendar, reporting, and weekly execution.
-- `launch-strategy` - Product launches, feature releases, waitlists, beta launches, and GTM rollouts.
+- `launch-strategy` - Product launches, feature launches, launch checklists, waitlists, beta launches, and GTM rollouts.
 - `launch-loop-strategy` - Practical 7-day feature launch loops: demo, post, share, reply, and repost.
 - `distribution-plan` - Social, PR, community, newsletter, founder-led, and partner distribution.
 - `content-strategy` - Blog, founder content, stories, examples, proof, and point of view.
+- `x-article-writer` - Longform X/Twitter articles, founder essays, launch essays, and growth teardowns.
 - `seo-strategy` - SEO pages, content clusters, site structure, and search acquisition.
 - `ai-seo` - AI answers, LLM citations, entity clarity, and public proof.
-- `copywriting` - Landing page, website, pricing, product, ad, and CTA copy.
+- `copywriting` - Website, landing page, pricing, product, hero, value proposition, and CTA copy.
 - `cro-audit` - Landing pages, signup, checkout, forms, onboarding, popups, and paywalls.
 - `ecommerce-app-cro` - Ecommerce pages, carts, checkout, app listings, screenshots, and paywalls.
 - `ab-testing` - Growth experiments, A/B tests, smoke tests, and decision-ready test plans.
@@ -77,7 +78,7 @@ Run the marketing skill validator:
 npm run validate
 ```
 
-The validator checks the curated 24-skill marketing set for required frontmatter, missing scaffold
+The validator checks the curated 25-skill marketing set for required frontmatter, missing scaffold
 placeholders, source-style frontmatter, denied source phrases, source-style headings, discoverability
 metadata, exact source-line overlap, excessive 8-word whole-file overlap, and excessive 6-word
 section-level overlap with the organized source corpus.

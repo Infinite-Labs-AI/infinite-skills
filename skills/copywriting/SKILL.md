@@ -1,11 +1,28 @@
 ---
 name: copywriting
-description: "Use when writing or rewriting website, landing page, pricing page, product page, ad, or CTA copy that needs to persuade and convert."
+description: "Use when writing or rewriting website copy: homepages, landing pages, pricing pages, product pages, feature pages, hero sections, headlines, subheads, CTAs, value propositions, taglines, and above-the-fold messaging. Do not use for email sequences, blog posts, longform X articles, or platform-specific ad copy."
 ---
 
 # Copywriting
 
-Write clear marketing copy that makes a strong promise and backs it up with proof.
+Write clear website and landing-page copy that makes a strong promise and backs it up with proof.
+
+## Scope
+
+Use this for:
+
+- Homepage, landing page, pricing page, feature page, product page, and about page copy.
+- Hero headline, subheadline, CTA, value proposition, tagline, section copy, and objection handling.
+- Rewriting weak page copy to make it clearer and more persuasive.
+
+Do not use this for:
+
+- Email flows or lifecycle messages. Use `email-sequence`.
+- Blog posts, SEO articles, or content calendars. Use `content-strategy` or `seo-strategy`.
+- Longform X/Twitter articles. Use `x-article-writer`.
+- Platform-specific Google, Meta, or LinkedIn ad copy. Use `creative-brief` or `paid-ads`.
+
+Before asking questions, read existing product-marketing context if present: `.agents/product-marketing.md`, `.claude/product-marketing.md`, or `product-marketing-context.md`.
 
 ## Copy Inputs
 
@@ -63,6 +80,14 @@ Avoid:
 - Exclamation marks as intensity.
 - Feature dumps without user consequence.
 
+## Page Notes
+
+- **Homepage:** explain the product and create clear paths for different visitors.
+- **Landing page:** one audience, one promise, one primary CTA.
+- **Pricing page:** help the buyer choose, reduce risk, and explain plan differences.
+- **Feature/product page:** connect feature, use case, proof, and outcome.
+- **About page:** tell the story only where it strengthens trust or conversion.
+
 ## Output
 
 ```text
@@ -78,9 +103,18 @@ Claim and proof table:
 | Claim | Proof type | Strength | Wording ceiling | Placement | Gap |
 
 Draft:
+Headline options:
+1. [headline]
+2. [headline]
+3. [headline]
+
 Hero headline:
 Subhead:
 Primary CTA:
+Secondary CTA:
+CTA options:
+- [option]
+- [option]
 
 Section flow:
 1. [section name]
@@ -92,4 +126,8 @@ Objection answers:
 
 Proof gaps:
 - [claim needing evidence]
+
+Optional SEO:
+Title:
+Meta description:
 ```

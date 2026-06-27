@@ -1,4 +1,4 @@
 interface:
   display_name: "Copywriting"
-  short_description: "writing or rewriting website, landing page, pricing page, p."
-  default_prompt: "Use $copywriting to help with this marketing task."
+  short_description: "Write website, landing page, and CTA copy."
+  default_prompt: "Use $copywriting to rewrite this landing page copy."
