@@ -12,14 +12,23 @@ Enable Infinite Skills in Codex via local skill discovery.
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/Infinite-Labs-OS/infinite-skills.git ~/.codex/infinite-skills
+   git clone https://github.com/Infinite-Labs-AI/infinite-skills.git ~/.codex/infinite-skills
    ```
 
-2. Link the goal skill into Codex skills:
+2. Link a skill into Codex skills:
 
    ```bash
    mkdir -p ~/.codex/skills
    ln -s ~/.codex/infinite-skills/skills/goal ~/.codex/skills/goal
+   ```
+
+   Or install every skill:
+
+   ```bash
+   mkdir -p ~/.codex/skills
+   for skill in ~/.codex/infinite-skills/skills/*; do
+     ln -sfn "$skill" ~/.codex/skills/"$(basename "$skill")"
+   done
    ```
 
 3. Restart Codex.
@@ -37,6 +46,7 @@ The symlink points to the cloned repo, so updates are picked up after restart.
 
 ```bash
 rm ~/.codex/skills/goal
+rm ~/.codex/skills/launch-loop-strategy
 ```
 
 Optionally remove the clone:

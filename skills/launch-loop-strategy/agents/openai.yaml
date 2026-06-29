@@ -1,0 +1,5 @@
+interface:
+  display_name: "Launch Loop Strategy"
+  short_description: "Plan a week-long feature launch loop"
+  default_prompt: "Use $launch-loop-strategy to plan a launch loop for my feature launch."
+
