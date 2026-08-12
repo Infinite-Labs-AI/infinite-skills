@@ -1,0 +1,4 @@
+interface:
+  display_name: "X/Twitter Source Research"
+  short_description: "Collect bounded public X evidence for marketing research."
+  default_prompt: "Use $x-twitter-scraper to build a source-labelled X research packet for this decision."

@@ -83,6 +83,7 @@ EXPECTED_MARKETING_SKILLS = {
     "sales-enablement",
     "seo-strategy",
     "x-article-writer",
+    "x-twitter-scraper",
 }
 
 
