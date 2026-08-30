@@ -106,8 +106,7 @@ npm run validate
 The validator checks the curated 25-skill marketing set for expected directories, required
 frontmatter, missing scaffold placeholders, source-style frontmatter, denied source phrases,
 source-style headings, and discoverability metadata. With the corpus available it also checks
-external-corpus slug, normalized-line, 8-word whole-file shingle, and 6-word section-containment
-overlap.
+normalized-line, 8-word whole-file shingle, and 6-word section-containment overlap.
 
 When the original organized source corpus is not available, use:
 
@@ -115,8 +114,8 @@ When the original organized source corpus is not available, use:
 ALLOW_MISSING_SOURCE_CORPUS=1 npm run validate
 ```
 
-This mode still runs the structural and content checks above. It explicitly skips external-corpus
-slug, 8-word shingle, normalized-line, and section-containment overlap comparisons, so it cannot
+This mode still runs the structural and content checks above. It explicitly skips the external-
+corpus 8-word shingle, normalized-line, and section-containment overlap comparisons, so it cannot
 establish corpus-distinctness on its own.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution and validation gate.

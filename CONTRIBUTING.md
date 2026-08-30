@@ -29,8 +29,8 @@ ALLOW_MISSING_SOURCE_CORPUS=1 npm run validate
 
 The corpus-absent mode still validates the expected marketing-skill set, skill layout,
 frontmatter, discovery metadata, headings, and content safeguards. It explicitly skips the
-external-corpus slug, 8-word shingle, normalized-line, and section-containment overlap checks.
-State that limitation in your pull request; a passing corpus-absent run does not establish
+external-corpus 8-word shingle, normalized-line, and section-containment overlap checks. State
+that limitation in your pull request; a passing corpus-absent run does not establish
 corpus-distinctness.
 
 ## Install changes
