@@ -1,7 +1,14 @@
 # Infinite Skills
 
 Infinite Skills is a collection of Codex skills for goal-setting and marketing operator work.
-Each skill lives in a flat `skills/<skill-name>/SKILL.md` directory.
+It contains 26 total skills: **25 marketing skills plus the Goal skill**. Each skill lives in a
+flat `skills/<skill-name>/SKILL.md` directory.
+
+Part of the [Infinite](https://infinite.fast/) ecosystem:
+
+- [Infinite OS](https://github.com/Infinite-Labs-AI/infinite-os) is the local growth engine and CLI.
+- [Infinite Agent Ecosystem](https://infinite.fast/agents/) shows the shipped public tools and their boundaries.
+- [infinite.fast](https://infinite.fast/) is the main website.
 
 The marketing set was designed from a review of a larger external marketing skill corpus, but it is
 not a one-for-one remake. The repo keeps a smaller curated set with different names, workflows,
@@ -42,50 +49,77 @@ headings, deliverables, and validation checks.
 - `retention` - Activation, churn, cancellation flows, winback, failed payments, renewal, and expansion.
 - `creative-brief` - Ad, social, image, video, launch, UGC, and creator asset briefs.
 
-## Install For Codex
+## Install for Codex
 
-Clone this repository:
-
-```bash
-git clone https://github.com/Infinite-Labs-AI/infinite-skills.git ~/.codex/infinite-skills
-```
-
-Install one skill:
+Run this complete discovery installer. It clones (or fast-forwards) the checkout, links every
+skill under `~/.codex/skills`, and never overwrites an existing file or a symlink that points
+somewhere else. Review any `Skipped` line before moving that destination and rerunning it.
 
 ```bash
-mkdir -p ~/.codex/skills
-ln -s ~/.codex/infinite-skills/skills/goal ~/.codex/skills/goal
-```
-
-Install every skill:
-
-```bash
-mkdir -p ~/.codex/skills
-for skill in ~/.codex/infinite-skills/skills/*; do
-  ln -sfn "$skill" ~/.codex/skills/"$(basename "$skill")"
+set -eu
+repo_url="${INFINITE_SKILLS_REPO_URL:-https://github.com/Infinite-Labs-AI/infinite-skills.git}"
+checkout="$HOME/.codex/infinite-skills"
+skills_dir="$HOME/.codex/skills"
+if [ -e "$checkout" ] || [ -L "$checkout" ]; then
+  if [ ! -d "$checkout/.git" ]; then
+    printf 'Cannot install: %s exists and is not an Infinite Skills git checkout.\n' "$checkout"
+    exit 1
+  fi
+  git -C "$checkout" pull --ff-only
+else
+  mkdir -p "$HOME/.codex"
+  git clone "$repo_url" "$checkout"
+fi
+mkdir -p "$skills_dir"
+for skill in "$checkout"/skills/*; do
+  [ -d "$skill" ] || continue
+  name="$(basename "$skill")"
+  target="$skills_dir/$name"
+  if [ -L "$target" ]; then
+    current="$(readlink "$target")"
+    if [ "$current" = "$skill" ]; then
+      printf 'Already installed: %s\n' "$name"
+    else
+      printf 'Skipped %s: symlink points to %s; left untouched. Remove it and rerun to install this skill.\n' "$name" "$current"
+    fi
+  elif [ -e "$target" ]; then
+    printf 'Skipped %s: destination exists; left untouched. Move it and rerun to install this skill.\n' "$name"
+  else
+    ln -s "$skill" "$target"
+    printf 'Installed: %s\n' "$name"
+  fi
 done
 ```
 
-Restart Codex after installing so the new skill is discovered.
-
-Detailed install notes are in [.codex/INSTALL.md](.codex/INSTALL.md).
+Restart Codex after installation so it discovers the new skills. To install just one skill, use
+the same non-clobbering checks above with that skill directory as the source.
 
 ## Validation
 
-Run the marketing skill validator:
+Run the marketing skill validator when the organized source corpus used during curation is
+available:
 
 ```bash
 npm run validate
 ```
 
-The validator checks the curated 25-skill marketing set for required frontmatter, missing scaffold
-placeholders, source-style frontmatter, denied source phrases, source-style headings, discoverability
-metadata, exact source-line overlap, excessive 8-word whole-file overlap, and excessive 6-word
-section-level overlap with the organized source corpus.
+The validator checks the curated 25-skill marketing set for expected directories, required
+frontmatter, missing scaffold placeholders, source-style frontmatter, denied source phrases,
+source-style headings, and discoverability metadata. With the corpus available it also checks
+external-corpus slug, normalized-line, 8-word whole-file shingle, and 6-word section-containment
+overlap.
 
-By default, validation expects the organized source corpus to exist at the local path used during
-creation. Set `ALLOW_MISSING_SOURCE_CORPUS=1` only when validating this repo without that corpus
-available.
+When the original organized source corpus is not available, use:
+
+```bash
+ALLOW_MISSING_SOURCE_CORPUS=1 npm run validate
+```
+
+This mode still runs the structural and content checks above. It explicitly skips external-corpus
+slug, 8-word shingle, normalized-line, and section-containment overlap comparisons, so it cannot
+establish corpus-distinctness on its own.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution and validation gate.
 
 ## Layout
 
